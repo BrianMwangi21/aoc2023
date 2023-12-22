@@ -5,7 +5,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
+	"strconv"
 )
+
+type Record struct {
+	time     int
+	distance int
+}
 
 func readFile(filename string) []string {
 	var data []string
@@ -31,7 +38,112 @@ func readFile(filename string) []string {
 	return data
 }
 
+func guard(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func getMatches(text string) []int {
+	var digits []int
+
+	pattern := `\b\d+`
+	r := regexp.MustCompile(pattern)
+	matches := r.FindAllString(text, -1)
+
+	for _, v := range matches {
+		digit, err := strconv.Atoi(v)
+		guard(err)
+
+		digits = append(digits, digit)
+	}
+
+	return digits
+}
+
+func getMatchesPartTwo(text string) []int {
+	var digits []int
+	var digitString string
+
+	pattern := `\b\d+`
+	r := regexp.MustCompile(pattern)
+	matches := r.FindAllString(text, -1)
+
+	for _, v := range matches {
+		digitString += v
+	}
+
+	digit, err := strconv.Atoi(digitString)
+	guard(err)
+
+	digits = append(digits, digit)
+
+	return digits
+}
+
+func getRecords(data []string, part string) []Record {
+	var records []Record
+	var times, distances []int
+
+	if part == "1" {
+		times = getMatches(data[0])
+		distances = getMatches(data[1])
+	} else if part == "2" {
+		times = getMatchesPartTwo(data[0])
+		distances = getMatchesPartTwo(data[1])
+	}
+
+	for i := 0; i < len(times); i++ {
+		records = append(records, Record{times[i], distances[i]})
+	}
+
+	return records
+}
+
+func getWaysToWin(record Record) int {
+	var waysToWin []int
+	time := record.time
+	distance := record.distance
+
+	for i := 1; i < time; i++ {
+		timeRemaining := time - i
+		distanceCovered := timeRemaining * i
+
+		if distanceCovered > distance {
+			waysToWin = append(waysToWin, i)
+		}
+	}
+
+	return len(waysToWin)
+}
+
+func partOne(data []string) int {
+	result := 1
+	records := getRecords(data, "1")
+
+	for _, v := range records {
+		waysToWin := getWaysToWin(v)
+		result *= waysToWin
+	}
+
+	return result
+}
+
+func partTwo(data []string) int {
+	result := 1
+	records := getRecords(data, "2")
+
+	for _, v := range records {
+		waysToWin := getWaysToWin(v)
+		result *= waysToWin
+	}
+
+	return result
+}
+
 func main() {
-	data := readFile("")
-	fmt.Println(data)
+	data := readFile("input.txt")
+
+	fmt.Println("Part One:", partOne(data))
+	fmt.Println("Part Two:", partTwo(data))
 }

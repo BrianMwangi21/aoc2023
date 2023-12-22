@@ -44,15 +44,27 @@ func guard(err error) {
 	}
 }
 
-func getMatches(text string) []int {
+func getMatches(text string, part string) []int {
 	var digits []int
+	var digitString string
 
 	pattern := `\b\d+`
 	r := regexp.MustCompile(pattern)
 	matches := r.FindAllString(text, -1)
 
-	for _, v := range matches {
-		digit, err := strconv.Atoi(v)
+	if part == "1" {
+		for _, v := range matches {
+			digit, err := strconv.Atoi(v)
+			guard(err)
+
+			digits = append(digits, digit)
+		}
+	} else if part == "2" {
+		for _, v := range matches {
+			digitString += v
+		}
+
+		digit, err := strconv.Atoi(digitString)
 		guard(err)
 
 		digits = append(digits, digit)
@@ -61,37 +73,12 @@ func getMatches(text string) []int {
 	return digits
 }
 
-func getMatchesPartTwo(text string) []int {
-	var digits []int
-	var digitString string
-
-	pattern := `\b\d+`
-	r := regexp.MustCompile(pattern)
-	matches := r.FindAllString(text, -1)
-
-	for _, v := range matches {
-		digitString += v
-	}
-
-	digit, err := strconv.Atoi(digitString)
-	guard(err)
-
-	digits = append(digits, digit)
-
-	return digits
-}
-
 func getRecords(data []string, part string) []Record {
 	var records []Record
 	var times, distances []int
 
-	if part == "1" {
-		times = getMatches(data[0])
-		distances = getMatches(data[1])
-	} else if part == "2" {
-		times = getMatchesPartTwo(data[0])
-		distances = getMatchesPartTwo(data[1])
-	}
+	times = getMatches(data[0], part)
+	distances = getMatches(data[1], part)
 
 	for i := 0; i < len(times); i++ {
 		records = append(records, Record{times[i], distances[i]})

@@ -104,21 +104,9 @@ func getWaysToWin(record Record) int {
 	return len(waysToWin)
 }
 
-func partOne(data []string) int {
+func partOneAndTwo(data []string, part string) int {
 	result := 1
-	records := getRecords(data, "1")
-
-	for _, v := range records {
-		waysToWin := getWaysToWin(v)
-		result *= waysToWin
-	}
-
-	return result
-}
-
-func partTwo(data []string) int {
-	result := 1
-	records := getRecords(data, "2")
+	records := getRecords(data, part)
 
 	for _, v := range records {
 		waysToWin := getWaysToWin(v)
@@ -131,6 +119,6 @@ func partTwo(data []string) int {
 func main() {
 	data := readFile("input.txt")
 
-	fmt.Println("Part One:", partOne(data))
-	fmt.Println("Part Two:", partTwo(data))
+	fmt.Println("Part One:", partOneAndTwo(data, "1"))
+	fmt.Println("Part Two:", partOneAndTwo(data, "2"))
 }
